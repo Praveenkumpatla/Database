@@ -1,0 +1,160 @@
+use Institute
+db.createCollection("Students")
+db.Students.insertMany([
+  {
+    "student": "Praveen kumar",
+    "fav_Subject": ["Maths", "Physics","Chemistry"],
+    "skills": ["React", "JavaScript", "HTML", "CSS", "C"],
+    "Batch": "B3"
+  },
+  {
+    "student": "Gopi",
+    "fav_Subject": ["Maths", "Physics"],
+    "skills": ["JavaScript", "HTML", "CSS"],
+    "Batch": "B2"
+  },
+  {
+    "student": "Akhil",
+    "fav_Subject": ["Chemistry", "Physics"],
+    "skills": ["React", "JavaScript", "HTML", "CSS"],
+    "Batch": "B1"
+  },
+  {
+    "student": "Manikanta",
+    "fav_Subject": ["Physics"],
+    "skills": ["JavaScript", "HTML", "CSS"],
+    "Batch": "B3"
+  },
+  {
+    "student": "Uday",
+    "fav_Subject": ["Maths"],
+    "skills": ["HTML", "CSS"],
+    "Batch": "B2"
+  },
+  {
+    "student": "keshav",
+    "fav_Subject": ["Maths","Chemistry"],
+    "skills": ["HTML", "CSS"],
+    "Batch": "B1"
+  }
+])
+db.createCollection("Batchs")
+db.Batchs.insertMany([
+  {
+    "Batch": "B1",
+    "Teacher": "Rajavasanth",
+    "attendance": [
+      {
+        "date":"01/04/2021",
+        "present":["Akhil","keshav"],
+        "absent":[]
+      },
+      {
+        "date":"02/04/2021",
+        "present":["Akhil"],
+        "absent":["keshav"]
+      },
+      {
+        "date":"03/04/2021",
+        "present":["keshav"],
+        "absent":["Akhil"]
+      },
+      {
+        "date":"04/04/2021",
+        "present":["Akhil","keshav"],
+        "absent":[]
+      }
+    ]
+  },
+  {
+    "Batch": "B2",
+    "Teacher": "Venkat",
+    "attendance": [
+      {
+        "date":"01/04/2021",
+        "present":["Gopi","Uday"],
+        "absent":[]
+      },
+      {
+        "date":"02/04/2021",
+        "present":["Gopi","Uday"],
+        "absent":[]
+      },
+      {
+        "date":"03/04/2021",
+        "present":["Gopi"],
+        "absent":["Uday"]
+      },
+      {
+        "date":"04/04/2021",
+        "present":["Uday"],
+        "absent":["Gopi"]
+      }
+    ]
+  },
+  {
+    "Batch": "B3",
+    "Teacher": "Vijay",
+    "attendance": [
+      {
+        "date":"01/04/2021",
+        "present":["Praveen kumar","Manikanta"],
+        "absent":[]
+      },
+      {
+        "date":"02/04/2021",
+        "present":["Praveen kumar","Manikanta"],
+        "absent":[]
+      },
+      {
+        "date":"03/04/2021",
+        "present":["Praveen kumar"],
+        "absent":["Manikanta"]
+      },
+      {
+        "date":"04/04/2021",
+        "present":["Praveen kumar","Manikanta"],
+        "absent":[]
+      }
+    ]
+  }
+])
+
+db.Students.aggregate([
+  {
+     $lookup: {
+      from: 'Batchs',
+      localField: 'Batch',
+      foreignField: 'Batch',
+      as: 'students'
+    }
+  },
+  {
+     $replaceRoot: {
+      newRoot: {
+        $mergeObjects: [
+          {
+            $arrayElemAt: [
+              '$students',
+              0
+            ]
+          },
+          '$$ROOT'
+        ]
+      }
+    }
+  },
+  { $project: { students: 0 } },
+  { $match: { student: 'Praveen kumar' }}
+])
+
+db.Students.aggregate([
+  {
+     $lookup: {
+      from: 'Students',
+      localField: 'Batch',
+      foreignField: 'Batch',
+      as: 'Students'
+    }
+  },{ $match: { Batch: 'B1' }}
+  ])
